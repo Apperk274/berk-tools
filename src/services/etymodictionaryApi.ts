@@ -16,7 +16,7 @@ export async function searchWord(word: string): Promise<WordData> {
   }
 
   try {
-    const response = await fetch(`${config.BACKEND_URL}/etymodictionary`, {
+    const response = await fetch(`${config.BACKEND_URL}/etymodictionary/look-up`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -36,7 +36,7 @@ export async function searchWord(word: string): Promise<WordData> {
     }
 
     const data = await response.json()
-    
+
     // Transform API response to WordData format
     // Format Turkish meanings from the API structure as bullet points
     const turkishMeanings = data.meaning_tr?.map((item: any) => {
@@ -49,7 +49,7 @@ export async function searchWord(word: string): Promise<WordData> {
     const etymologyLink = data.etymology?.link || undefined
 
     // Format pronunciation
-    const pronunciation = data.pronunciation ? 
+    const pronunciation = data.pronunciation ?
       `UK: ${data.pronunciation.easy_uk || data.pronunciation.ipa_uk || ''} | US: ${data.pronunciation.easy_us || data.pronunciation.ipa_us || ''}` : ''
 
     return {
