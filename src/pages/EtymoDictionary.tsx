@@ -70,24 +70,22 @@ function EtymoDictionary() {
   ]
 
   return (
-    <div className="tw:min-h-screen tw:bg-gradient-to-b tw:from-gray-900 tw:via-gray-800 tw:to-gray-900 tw:p-4">
+    <>
       {/* Header */}
-      <div className="tw:max-w-4xl tw:mx-auto tw:mb-6">
-        <div className="tw:flex tw:items-center tw:gap-4 tw:mb-4">
-          <Button
-            onClick={() => navigate('/')}
-            variant="secondary"
-            className="tw:py-3 tw:px-4"
-            icon={<span className="tw:text-xl">←</span>}
-          >
-            Back to Home
-          </Button>
-          <h1 className="tw:text-4xl tw:font-bold tw:text-white">
-            <span className="tw:bg-gradient-to-r tw:from-blue-400 tw:via-purple-500 tw:to-pink-500 tw:bg-clip-text tw:text-transparent">
-              EtymoDictionary
-            </span>
-          </h1>
-        </div>
+      <div className="tw:flex tw:justify-between">
+        <Button
+          onClick={() => navigate('/')}
+          variant="secondary"
+          className="tw:py-3 tw:px-4"
+          icon={<span className="tw:text-xl">←</span>}
+        >
+          Back to Home
+        </Button>
+        <h1 className="tw:text-4xl tw:font-bold tw:text-white">
+          <span className="tw:bg-linear-to-r tw:from-blue-400 tw:via-purple-500 tw:to-pink-500 tw:bg-clip-text tw:text-transparent">
+            EtymoDictionary
+          </span>
+        </h1>
       </div>
 
       {/* Tabs */}
@@ -113,7 +111,7 @@ function EtymoDictionary() {
           />
         )}
       </div>
-    </div>
+    </>
   )
 }
 
