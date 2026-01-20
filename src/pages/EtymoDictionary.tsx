@@ -5,7 +5,7 @@ import Tabs from '../components/ui/Tabs'
 import SearchTab from '../components/etymodictionary/SearchTab'
 import SavedWordsTab from '../components/etymodictionary/SavedWordsTab'
 import { type WordData } from '../components/etymodictionary/WordDetails'
-import { loadSavedWords, saveWord, deleteWord, syncSavedWordsToStorage } from '../services/etymodictionaryApi'
+import { loadSavedWords, saveWord, deleteWord, type SavedLemma } from '../services/etymodictionaryApi'
 import { isAuthenticated, login } from '../services/authService'
 
 function EtymoDictionary() {
@@ -13,7 +13,7 @@ function EtymoDictionary() {
   const [activeTab, setActiveTab] = useState<'search' | 'saved'>('search')
   const [isSaving, setIsSaving] = useState(false)
   const [isDeleting, setIsDeleting] = useState<string | null>(null)
-  const [savedWords, setSavedWords] = useState<WordData[]>([])
+  const [savedWords, setSavedWords] = useState<SavedLemma[]>([])
 
   // Check authentication on mount
   useEffect(() => {
@@ -40,17 +40,17 @@ function EtymoDictionary() {
     loadWords()
   }, [])
 
-  // Sync saved words to localStorage when they change
-  useEffect(() => {
-    syncSavedWordsToStorage(savedWords)
-  }, [savedWords])
-
   const handleSave = async (wordData: WordData) => {
     if (!isSaving) {
       setIsSaving(true)
       try {
         await saveWord(wordData)
-        const updated = [...savedWords, wordData]
+        // Add the new lemma to the list
+        const newLemma: SavedLemma = {
+          lemma: wordData.word,
+          created_at: new Date().toISOString()
+        }
+        const updated = [...savedWords, newLemma]
         setSavedWords(updated)
         alert('Word saved successfully!')
       } catch (e) {
@@ -62,12 +62,12 @@ function EtymoDictionary() {
     }
   }
 
-  const handleDelete = async (word: string) => {
+  const handleDelete = async (lemma: string) => {
     if (isDeleting) return
-    setIsDeleting(word)
+    setIsDeleting(lemma)
     try {
-      await deleteWord(word)
-      const updated = savedWords.filter(w => w.word !== word)
+      await deleteWord(lemma)
+      const updated = savedWords.filter(w => w.lemma !== lemma)
       setSavedWords(updated)
     } catch (e) {
       console.error('Failed to delete word:', e)

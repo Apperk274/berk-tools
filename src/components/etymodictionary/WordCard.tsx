@@ -1,15 +1,39 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Button from '../ui/Button'
 import WordDetails, { type WordData } from './WordDetails'
+import { loadLemmaDetails } from '../../services/etymodictionaryApi'
 
 interface WordCardProps {
-  wordData: WordData
-  onDelete: (word: string) => void
+  lemma: string
+  onDelete: (lemma: string) => void
   isDeleting: boolean
 }
 
-export default function WordCard({ wordData, onDelete, isDeleting }: WordCardProps) {
+export default function WordCard({ lemma, onDelete, isDeleting }: WordCardProps) {
   const [isExpanded, setIsExpanded] = useState(false)
+  const [wordData, setWordData] = useState<WordData | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  // Fetch details when expanded
+  useEffect(() => {
+    if (isExpanded && !wordData && !isLoading) {
+      const fetchDetails = async () => {
+        setIsLoading(true)
+        setError(null)
+        try {
+          const details = await loadLemmaDetails(lemma)
+          setWordData(details)
+        } catch (e) {
+          console.error('Failed to load lemma details:', e)
+          setError('Failed to load word details')
+        } finally {
+          setIsLoading(false)
+        }
+      }
+      fetchDetails()
+    }
+  }, [isExpanded, wordData, isLoading, lemma])
 
   return (
     <div className="tw:bg-gray-700/80 tw:backdrop-blur-sm tw:rounded-xl tw:border-2 tw:border-gray-600/50 tw:overflow-hidden tw:shadow-lg tw:hover:shadow-xl tw:hover:border-gray-500 tw:transition-all tw:duration-200 tw:my-2">
@@ -19,11 +43,11 @@ export default function WordCard({ wordData, onDelete, isDeleting }: WordCardPro
           className="tw:flex-1 tw:text-left tw:hover:opacity-80 tw:transition-opacity"
         >
           <h3 className="tw:text-xl tw:font-bold tw:text-white tw:capitalize">
-            {wordData.word}
+            {lemma}
           </h3>
         </button>
         <Button
-          onClick={() => onDelete(wordData.word)}
+          onClick={() => onDelete(lemma)}
           disabled={isDeleting}
           isLoading={isDeleting}
           variant="danger"
@@ -34,7 +58,19 @@ export default function WordCard({ wordData, onDelete, isDeleting }: WordCardPro
 
       {isExpanded && (
         <div className="tw:border-t-2 tw:border-gray-600/50 tw:bg-gray-800/60 tw:py-6 tw:px-6">
-          <WordDetails wordData={wordData} headingSize="md" />
+          {isLoading && (
+            <div className="tw:text-center tw:py-4 tw:text-gray-400">
+              Loading details...
+            </div>
+          )}
+          {error && (
+            <div className="tw:text-center tw:py-4 tw:text-red-400">
+              {error}
+            </div>
+          )}
+          {wordData && !isLoading && (
+            <WordDetails wordData={wordData} headingSize="md" />
+          )}
         </div>
       )}
     </div>

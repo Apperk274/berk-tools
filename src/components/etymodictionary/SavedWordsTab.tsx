@@ -1,21 +1,19 @@
 import { useState } from 'react'
 import Input from '../ui/Input'
 import WordCard from './WordCard'
-import { type WordData } from './WordDetails'
+import { type SavedLemma } from '../../services/etymodictionaryApi'
 
 interface SavedWordsTabProps {
-  savedWords: WordData[]
-  onDelete: (word: string) => Promise<void>
+  savedWords: SavedLemma[]
+  onDelete: (lemma: string) => Promise<void>
   isDeleting: string | null
 }
 
 export default function SavedWordsTab({ savedWords, onDelete, isDeleting }: SavedWordsTabProps) {
   const [searchInput, setSearchInput] = useState('')
 
-  const filteredWords = savedWords.filter((wordData) => 
-    wordData.word.toLowerCase().includes(searchInput.toLowerCase()) ||
-    wordData.definition.toLowerCase().includes(searchInput.toLowerCase()) ||
-    wordData.turkishEquivalent.some(tr => tr.toLowerCase().includes(searchInput.toLowerCase()))
+  const filteredWords = savedWords.filter((savedLemma) => 
+    savedLemma.lemma.toLowerCase().includes(searchInput.toLowerCase())
   )
 
   return (
@@ -44,12 +42,12 @@ export default function SavedWordsTab({ savedWords, onDelete, isDeleting }: Save
           </div>
         ) : (
           <div className="tw:space-y-4">
-            {filteredWords.map((wordData) => (
+            {filteredWords.map((savedLemma) => (
               <WordCard
-                key={wordData.word}
-                wordData={wordData}
+                key={savedLemma.lemma}
+                lemma={savedLemma.lemma}
                 onDelete={onDelete}
-                isDeleting={isDeleting === wordData.word}
+                isDeleting={isDeleting === savedLemma.lemma}
               />
             ))}
           </div>
