@@ -1,3 +1,4 @@
+import axios, { AxiosError } from 'axios'
 import { type WordData } from '../components/etymodictionary/WordDetails'
 import { config } from '../config'
 import { getAuthHeader } from './authService'
@@ -16,26 +17,20 @@ export async function searchWord(word: string): Promise<WordData> {
   }
 
   try {
-    const response = await fetch(`${config.BACKEND_URL}/etymodictionary/look-up`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': authHeader
-      },
-      body: JSON.stringify({
+    const response = await axios.post(
+      `${config.BACKEND_URL}/etymodictionary/look-up`,
+      {
         message: word,
         force: false
-      })
-    })
-
-    if (!response.ok) {
-      if (response.status === 401) {
-        throw new Error('Authentication failed. Please login again.')
+      },
+      {
+        headers: {
+          'Authorization': authHeader
+        }
       }
-      throw new Error(`Failed to search word: ${response.statusText}`)
-    }
+    )
 
-    const data = await response.json()
+    const data = response.data
 
     // Transform API response to WordData format
     // Format Turkish meanings from the API structure as bullet points
@@ -63,6 +58,14 @@ export async function searchWord(word: string): Promise<WordData> {
     }
   } catch (error) {
     console.error('Error searching word:', error)
+    
+    if (axios.isAxiosError(error)) {
+      if (error.response?.status === 401) {
+        throw new Error('Authentication failed. Please login again.')
+      }
+      throw new Error(`Failed to search word: ${error.message}`)
+    }
+    
     throw error
   }
 }
