@@ -50,65 +50,68 @@ export default function SearchTab({ onSave, isSaving }: SearchTabProps) {
   }
 
   return (
-    <div className="tw:space-y-4">
-      {/* Search Input */}
-      <div className="tw:flex tw:gap-0 tw:border tw:border-gray-700/50 tw:rounded-lg tw:overflow-hidden">
-        <Input
-          value={searchInput}
-          onChange={(e) => setSearchInput(e.target.value)}
-          onKeyPress={handleKeyPress}
-          placeholder="Enter a word to search..."
-          disabled={isLoading}
-          isLoading={isLoading}
-          className="tw:rounded-l-lg tw:rounded-r-none tw:border-r-0"
-        />
-        <Button
-          onClick={handleSearch}
-          disabled={isLoading || !searchInput.trim()}
-          isLoading={isLoading}
-          variant="primary"
-          className="tw:px-10 tw:min-w-[120px] tw:rounded-l-none tw:shadow-none"
-        >
-          {isLoading ? 'Searching' : 'Send'}
-        </Button>
+    <div className="tw:flex tw:flex-col tw:h-full tw:overflow-hidden">
+      {/* Search Input - Fixed */}
+      <div className="tw:flex-shrink-0 tw:mb-4">
+        <div className="tw:flex tw:gap-0 tw:border tw:border-gray-700/50 tw:rounded-lg tw:overflow-hidden">
+          <Input
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            onKeyPress={handleKeyPress}
+            placeholder="Enter a word to search..."
+            disabled={isLoading}
+            isLoading={isLoading}
+            className="tw:rounded-l-lg tw:rounded-r-none tw:border-r-0"
+          />
+          <Button
+            onClick={handleSearch}
+            disabled={isLoading || !searchInput.trim()}
+            isLoading={isLoading}
+            variant="primary"
+            className="tw:px-10 tw:min-w-[120px] tw:rounded-l-none tw:shadow-none"
+          >
+            {isLoading ? 'Searching' : 'Send'}
+          </Button>
+        </div>
       </div>
 
-      {/* Error State */}
-      {error && (
-        <div className="tw:text-center tw:py-8">
-          <div className="tw:text-red-400">{error}</div>
-        </div>
-      )}
-
-      {/* Loading State */}
-      {isLoading && (
-        <div className="tw:text-center tw:py-8">
-          <div className="tw:text-gray-400">Searching...</div>
-        </div>
-      )}
-
-      {/* Result Display */}
-      {currentResult && !isLoading && (
-        <div className="tw:bg-gray-800 tw:rounded-lg tw:p-6 tw:border tw:border-gray-700 tw:my-2">
-          <div className="tw:mb-4 tw:flex tw:items-center tw:justify-between">
-            <h2 className="tw:text-2xl tw:font-bold tw:text-white tw:capitalize">
-              {currentResult.word}
-            </h2>
-            <Button
-              onClick={handleSave}
-              disabled={isSaving}
-              isLoading={isSaving}
-              variant="success"
-              className="tw:py-3 tw:px-5"
-              icon={<span className="tw:text-xl">💾</span>}
-            />
+      {/* Scrollable Content Area */}
+      <div className="tw:flex-1 tw:overflow-y-auto tw:overflow-x-hidden">
+        {/* Error State */}
+        {error && (
+          <div className="tw:text-center tw:py-8">
+            <div className="tw:text-red-400">{error}</div>
           </div>
+        )}
 
-          <div className="tw:max-h-[60vh] tw:overflow-y-auto tw:pr-2">
+        {/* Loading State */}
+        {isLoading && (
+          <div className="tw:text-center tw:py-8">
+            <div className="tw:text-gray-400">Searching...</div>
+          </div>
+        )}
+
+        {/* Result Display */}
+        {currentResult && !isLoading && (
+          <div className="tw:bg-gray-800 tw:rounded-lg tw:p-6 tw:border tw:border-gray-700">
+            <div className="tw:mb-4 tw:flex tw:items-center tw:justify-between">
+              <h2 className="tw:text-2xl tw:font-bold tw:text-white tw:capitalize">
+                {currentResult.word}
+              </h2>
+              <Button
+                onClick={handleSave}
+                disabled={isSaving}
+                isLoading={isSaving}
+                variant="success"
+                className="tw:py-3 tw:px-5"
+                icon={<span className="tw:text-xl">💾</span>}
+              />
+            </div>
+
             <WordDetails wordData={currentResult} />
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   )
 }

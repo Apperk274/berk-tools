@@ -1,4 +1,6 @@
 import { type WordData } from '../components/etymodictionary/WordDetails'
+import { config } from '../config'
+import { getAuthHeader } from './authService'
 
 const STORAGE_KEY = 'etymodictionary-words'
 
@@ -8,25 +10,60 @@ const STORAGE_KEY = 'etymodictionary-words'
  * @returns Promise resolving to WordData
  */
 export async function searchWord(word: string): Promise<WordData> {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 1500))
+  const authHeader = getAuthHeader()
+  if (!authHeader) {
+    throw new Error('Authentication required')
+  }
 
-  // TODO: Replace with actual API call:
-  // const response = await fetch(`/api/words/${encodeURIComponent(word)}`)
-  // if (!response.ok) throw new Error('Failed to search word')
-  // return response.json()
+  try {
+    const response = await fetch(`${config.BACKEND_URL}/etymodictionary`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': authHeader
+      },
+      body: JSON.stringify({
+        message: word,
+        force: false
+      })
+    })
 
-  // Mock response
-  return {
-    word: word.toLowerCase(),
-    definition: `A definition for "${word}". This is a placeholder definition that will be replaced with actual API data.`,
-    exampleSentences: [
-      `Here's an example sentence using "${word}".`,
-      `Another example: "${word}" can be used in various contexts.`
-    ],
-    turkishEquivalent: `Türkçe karşılığı: ${word}`,
-    etymology: `The word "${word}" comes from... (etymology details will be provided by the API)`,
-    howToRemember: `To remember "${word}", think about... (memory tip will be provided by the API)`
+    if (!response.ok) {
+      if (response.status === 401) {
+        throw new Error('Authentication failed. Please login again.')
+      }
+      throw new Error(`Failed to search word: ${response.statusText}`)
+    }
+
+    const data = await response.json()
+    
+    // Transform API response to WordData format
+    // Format Turkish meanings from the API structure as bullet points
+    const turkishMeanings = data.meaning_tr?.map((item: any) => {
+      const translations = item.tr?.join(', ') || ''
+      return item.sense ? `${item.sense}: ${translations}` : translations
+    }) || []
+
+    // Format etymology from the API structure
+    const etymologyText = data.etymology?.text || ''
+    const etymologyLink = data.etymology?.link || undefined
+
+    // Format pronunciation
+    const pronunciation = data.pronunciation ? 
+      `UK: ${data.pronunciation.easy_uk || data.pronunciation.ipa_uk || ''} | US: ${data.pronunciation.easy_us || data.pronunciation.ipa_us || ''}` : ''
+
+    return {
+      word: data.target || word.toLowerCase(),
+      definition: data.meaning_en || '',
+      exampleSentences: data.examples || [],
+      turkishEquivalent: turkishMeanings,
+      etymology: etymologyText + (pronunciation ? `\n\nPronunciation: ${pronunciation}` : ''),
+      etymologyLink: etymologyLink,
+      howToRemember: data.remember_insight || ''
+    }
+  } catch (error) {
+    console.error('Error searching word:', error)
+    throw error
   }
 }
 

@@ -6,6 +6,7 @@ import SearchTab from '../components/etymodictionary/SearchTab'
 import SavedWordsTab from '../components/etymodictionary/SavedWordsTab'
 import { type WordData } from '../components/etymodictionary/WordDetails'
 import { loadSavedWords, saveWord, deleteWord, syncSavedWordsToStorage } from '../services/etymodictionaryApi'
+import { isAuthenticated, login } from '../services/authService'
 
 function EtymoDictionary() {
   const navigate = useNavigate()
@@ -13,6 +14,18 @@ function EtymoDictionary() {
   const [isSaving, setIsSaving] = useState(false)
   const [isDeleting, setIsDeleting] = useState<string | null>(null)
   const [savedWords, setSavedWords] = useState<WordData[]>([])
+
+  // Check authentication on mount
+  useEffect(() => {
+    if (!isAuthenticated()) {
+      const loggedIn = login()
+      if (!loggedIn) {
+        alert('Authentication is required to access EtymoDictionary')
+        navigate('/')
+        return
+      }
+    }
+  }, [navigate])
 
   // Load saved words from API on mount
   useEffect(() => {
@@ -70,9 +83,9 @@ function EtymoDictionary() {
   ]
 
   return (
-    <>
+    <div className="tw:h-full tw:flex tw:flex-col tw:overflow-hidden">
       {/* Header */}
-      <div className="tw:flex tw:justify-between">
+      <div className="tw:flex tw:justify-between tw:flex-shrink-0 tw:mb-4">
         <Button
           onClick={() => navigate('/')}
           variant="secondary"
@@ -88,30 +101,33 @@ function EtymoDictionary() {
         </h1>
       </div>
 
-      {/* Tabs */}
-      <div className="tw:max-w-4xl tw:mx-auto">
+      {/* Tabs and Content */}
+      <div className="tw:max-w-4xl tw:mx-auto tw:w-full tw:flex tw:flex-col tw:flex-1 tw:overflow-hidden">
         <Tabs
           tabs={tabs}
           activeTab={activeTab}
           onTabChange={(tabId) => setActiveTab(tabId as 'search' | 'saved')}
-          className="tw:my-3"
+          className="tw:my-3 tw:flex-shrink-0"
         />
 
-        {/* Search Tab */}
-        {activeTab === 'search' && (
-          <SearchTab onSave={handleSave} isSaving={isSaving} />
-        )}
+        {/* Scrollable Content Area */}
+        <div className="tw:flex-1 tw:overflow-y-auto tw:overflow-x-hidden">
+          {/* Search Tab */}
+          {activeTab === 'search' && (
+            <SearchTab onSave={handleSave} isSaving={isSaving} />
+          )}
 
-        {/* Saved Words Tab */}
-        {activeTab === 'saved' && (
-          <SavedWordsTab
-            savedWords={savedWords}
-            onDelete={handleDelete}
-            isDeleting={isDeleting}
-          />
-        )}
+          {/* Saved Words Tab */}
+          {activeTab === 'saved' && (
+            <SavedWordsTab
+              savedWords={savedWords}
+              onDelete={handleDelete}
+              isDeleting={isDeleting}
+            />
+          )}
+        </div>
       </div>
-    </>
+    </div>
   )
 }
 

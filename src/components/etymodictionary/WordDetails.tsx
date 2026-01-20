@@ -2,8 +2,9 @@ interface WordData {
   word: string
   definition: string
   exampleSentences: string[]
-  turkishEquivalent: string
+  turkishEquivalent: string[]
   etymology: string
+  etymologyLink?: string
   howToRemember: string
 }
 
@@ -37,13 +38,32 @@ export default function WordDetails({ wordData, headingSize = 'lg' }: WordDetail
       {/* Turkish Equivalent */}
       <div className={sectionPadding}>
         <h3 className={`${headingClass} tw:text-blue-400 tw:mb-2`}>Turkish Equivalent</h3>
-        <p className="tw:text-gray-300">{wordData.turkishEquivalent}</p>
+        <ul className="tw:list-disc tw:list-inside tw:space-y-1">
+          {wordData.turkishEquivalent.map((meaning, idx) => (
+            <li key={idx} className="tw:text-gray-300">{meaning}</li>
+          ))}
+        </ul>
       </div>
 
       {/* Etymology */}
       <div className={sectionPadding}>
         <h3 className={`${headingClass} tw:text-blue-400 tw:mb-2`}>Etymology</h3>
-        <p className="tw:text-gray-300">{wordData.etymology}</p>
+        <p className="tw:text-gray-300 tw:whitespace-pre-line">
+          {wordData.etymology}
+          {wordData.etymologyLink && (
+            <>
+              {' '}
+              <a 
+                href={wordData.etymologyLink} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="tw:text-blue-400 tw:underline hover:tw:text-blue-300 tw:transition-colors"
+              >
+                [Source]
+              </a>
+            </>
+          )}
+        </p>
       </div>
 
       {/* How to Remember */}
