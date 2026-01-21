@@ -4,8 +4,9 @@ import Button from '../components/ui/Button'
 import Tabs from '../components/ui/Tabs'
 import SearchTab from '../components/etymodictionary/SearchTab'
 import SavedWordsTab from '../components/etymodictionary/SavedWordsTab'
-import { type WordData } from '../components/etymodictionary/WordDetails'
-import { loadSavedWords, saveWord, deleteWord, type SavedLemma } from '../services/etymodictionaryApi'
+import type { WordData } from '../types/word'
+import type { SavedLemma } from '../types/api'
+import { loadSavedWords, saveWord, deleteWord } from '../services/etymodictionary'
 import { isAuthenticated, login } from '../services/authService'
 
 function EtymoDictionary() {

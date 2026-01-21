@@ -2,10 +2,7 @@
  * Authentication service using Basic Auth
  */
 
-interface AuthCredentials {
-  username: string
-  password: string
-}
+import type { AuthCredentials } from '../types/auth'
 
 const AUTH_STORAGE_KEY = 'auth-credentials'
 

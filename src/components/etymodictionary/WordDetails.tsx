@@ -1,12 +1,4 @@
-interface WordData {
-  word: string
-  definition: string
-  exampleSentences: string[]
-  turkishEquivalent: string[]
-  etymology: string
-  etymologyLink?: string
-  howToRemember: string
-}
+import type { WordData } from '../../types/word'
 
 interface WordDetailsProps {
   wordData: WordData
@@ -75,4 +67,3 @@ export default function WordDetails({ wordData, headingSize = 'lg' }: WordDetail
   )
 }
 
-export type { WordData }

@@ -1,4 +1,4 @@
-import { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import LoadingSpinner from './LoadingSpinner'
 
 interface ButtonProps {
@@ -32,7 +32,7 @@ export default function Button({
   const isDisabled = disabled || isLoading
 
   const baseClasses = 'tw:px-6 tw:py-3 tw:rounded-xl tw:font-semibold tw:text-base tw:transition-all tw:duration-200 tw:flex tw:items-center tw:justify-center tw:gap-2 tw:active:scale-95 tw:shadow-md hover:tw:shadow-xl hover:tw:scale-[1.02] disabled:tw:opacity-50 disabled:tw:cursor-not-allowed disabled:hover:tw:scale-100'
-  
+
   const variantClass = variantClasses[variant]
   const textColorClass = variant === 'secondary' ? 'tw:text-white' : 'tw:text-white'
 

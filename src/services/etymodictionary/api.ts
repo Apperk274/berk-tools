@@ -1,14 +1,13 @@
-import axios, { AxiosError } from 'axios'
-import { type WordData } from '../components/etymodictionary/WordDetails'
-import { config } from '../config'
-import { getAuthHeader } from './authService'
+/**
+ * EtymoDictionary API client
+ */
 
-const STORAGE_KEY = 'etymodictionary-words'
-
-export interface SavedLemma {
-  lemma: string
-  created_at: string
-}
+import axios from 'axios'
+import { config } from '../../config'
+import { getAuthHeader } from '../authService'
+import type { ApiWordResponse, SavedLemma } from '../../types/api'
+import type { WordData } from '../../types/word'
+import { transformApiResponseToWordData } from './transformers'
 
 /**
  * Search for a word definition
@@ -35,32 +34,8 @@ export async function searchWord(word: string): Promise<WordData> {
       }
     )
 
-    const data = response.data
-
-    // Transform API response to WordData format
-    // Format Turkish meanings from the API structure as bullet points
-    const turkishMeanings = data.meaning_tr?.map((item: any) => {
-      const translations = item.tr?.join(', ') || ''
-      return item.sense ? `${item.sense}: ${translations}` : translations
-    }) || []
-
-    // Format etymology from the API structure
-    const etymologyText = data.etymology?.text || ''
-    const etymologyLink = data.etymology?.link || undefined
-
-    // Format pronunciation
-    const pronunciation = data.pronunciation ?
-      `UK: ${data.pronunciation.easy_uk || data.pronunciation.ipa_uk || ''} | US: ${data.pronunciation.easy_us || data.pronunciation.ipa_us || ''}` : ''
-
-    return {
-      word: data.target || word.toLowerCase(),
-      definition: data.meaning_en || '',
-      exampleSentences: data.examples || [],
-      turkishEquivalent: turkishMeanings,
-      etymology: etymologyText + (pronunciation ? `\n\nPronunciation: ${pronunciation}` : ''),
-      etymologyLink: etymologyLink,
-      howToRemember: data.remember_insight || ''
-    }
+    const data = response.data as ApiWordResponse
+    return transformApiResponseToWordData(data, word)
   } catch (error) {
     console.error('Error searching word:', error)
     
@@ -132,29 +107,8 @@ export async function loadLemmaDetails(lemma: string): Promise<WordData> {
       }
     )
     
-    const data = response.data
-    
-    // Transform API response to WordData format
-    const turkishMeanings = data.meaning_tr?.map((item: any) => {
-      const translations = item.tr?.join(', ') || ''
-      return item.sense ? `${item.sense}: ${translations}` : translations
-    }) || []
-
-    const etymologyText = data.etymology?.text || ''
-    const etymologyLink = data.etymology?.link || undefined
-
-    const pronunciation = data.pronunciation ? 
-      `UK: ${data.pronunciation.easy_uk || data.pronunciation.ipa_uk || ''} | US: ${data.pronunciation.easy_us || data.pronunciation.ipa_us || ''}` : ''
-
-    return {
-      word: data.target || lemma,
-      definition: data.meaning_en || '',
-      exampleSentences: data.examples || [],
-      turkishEquivalent: turkishMeanings,
-      etymology: etymologyText + (pronunciation ? `\n\nPronunciation: ${pronunciation}` : ''),
-      etymologyLink: etymologyLink,
-      howToRemember: data.remember_insight || ''
-    }
+    const data = response.data as ApiWordResponse
+    return transformApiResponseToWordData(data, lemma)
   } catch (error) {
     console.error(`Error loading lemma details for: ${lemma}`, error)
     
@@ -238,19 +192,5 @@ export async function deleteWord(word: string): Promise<void> {
     }
     
     throw error
-  }
-}
-
-/**
- * Sync saved words to localStorage (utility function for components)
- * Note: This is kept for backward compatibility but may not be needed with API backend
- * @param words - Array of WordData to sync
- */
-export function syncSavedWordsToStorage(words: WordData[]): void {
-  // Optional: Keep local cache for offline access
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(words))
-  } catch (e) {
-    console.error('Failed to sync saved words to localStorage:', e)
   }
 }

@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import Input from '../ui/Input'
 import Button from '../ui/Button'
-import WordDetails, { type WordData } from './WordDetails'
-import { searchWord as searchWordApi } from '../../services/etymodictionaryApi'
+import WordDetails from './WordDetails'
+import type { WordData } from '../../types/word'
+import { searchWord as searchWordApi } from '../../services/etymodictionary'
 
 interface SearchTabProps {
   onSave: (wordData: WordData) => Promise<void>

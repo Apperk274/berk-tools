@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import Input from '../ui/Input'
 import WordCard from './WordCard'
-import { type SavedLemma } from '../../services/etymodictionaryApi'
+import type { SavedLemma } from '../../types/api'
 
 interface SavedWordsTabProps {
   savedWords: SavedLemma[]

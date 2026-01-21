@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import Button from '../ui/Button'
-import WordDetails, { type WordData } from './WordDetails'
-import { loadLemmaDetails } from '../../services/etymodictionaryApi'
+import WordDetails from './WordDetails'
+import type { WordData } from '../../types/word'
+import { loadLemmaDetails } from '../../services/etymodictionary'
 
 interface WordCardProps {
   lemma: string
