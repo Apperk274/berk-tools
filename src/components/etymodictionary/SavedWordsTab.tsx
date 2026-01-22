@@ -12,15 +12,18 @@ interface SavedWordsTabProps {
 export default function SavedWordsTab({ savedWords, onDelete, isDeleting }: SavedWordsTabProps) {
   const [searchInput, setSearchInput] = useState('')
 
-  const filteredWords = savedWords.filter((savedLemma) => 
+  // Ensure savedWords is always an array
+  const wordsArray = Array.isArray(savedWords) ? savedWords : []
+  
+  const filteredWords = wordsArray.filter((savedLemma) => 
     savedLemma.lemma.toLowerCase().includes(searchInput.toLowerCase())
   )
 
   return (
     <div className="tw:flex tw:flex-col tw:h-full tw:overflow-hidden">
       {/* Search Bar - Fixed */}
-      {savedWords.length > 0 && (
-        <div className="tw:flex-shrink-0 tw:mb-4">
+      {wordsArray.length > 0 && (
+        <div className="tw:shrink-0 tw:mb-4">
           <Input
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
@@ -32,7 +35,7 @@ export default function SavedWordsTab({ savedWords, onDelete, isDeleting }: Save
       
       {/* Scrollable List Area */}
       <div className="tw:flex-1 tw:overflow-y-auto tw:overflow-x-hidden">
-        {savedWords.length === 0 ? (
+        {wordsArray.length === 0 ? (
           <div className="tw:text-center tw:py-12 tw:text-gray-400">
             No saved words yet. Search for words and save them to see them here.
           </div>

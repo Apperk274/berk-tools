@@ -1,102 +1,86 @@
 /**
- * Authentication service using Basic Auth
+ * Authentication service using JWT Bearer tokens
  */
 
-import type { AuthCredentials } from '../types/auth'
+import { signInApi } from './auth'
 
-const AUTH_STORAGE_KEY = 'auth-credentials'
+const AUTH_TOKEN_KEY = 'auth-token'
 
 /**
- * Get stored credentials from localStorage
+ * Get stored JWT token from localStorage
  */
-export function getStoredCredentials(): AuthCredentials | null {
+export function getToken(): string | null {
   try {
-    const stored = localStorage.getItem(AUTH_STORAGE_KEY)
-    if (stored) {
-      return JSON.parse(stored)
-    }
+    return localStorage.getItem(AUTH_TOKEN_KEY)
   } catch (e) {
-    console.error('Failed to load credentials:', e)
+    console.error('Failed to load token:', e)
+    return null
   }
-  return null
 }
 
 /**
- * Store credentials in localStorage
+ * Store JWT token in localStorage
  */
-export function storeCredentials(credentials: AuthCredentials): void {
+export function setToken(token: string): void {
   try {
-    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(credentials))
+    localStorage.setItem(AUTH_TOKEN_KEY, token)
   } catch (e) {
-    console.error('Failed to store credentials:', e)
+    console.error('Failed to store token:', e)
   }
 }
 
 /**
- * Clear stored credentials
+ * Clear stored JWT token
  */
-export function clearCredentials(): void {
+export function clearToken(): void {
   try {
-    localStorage.removeItem(AUTH_STORAGE_KEY)
+    localStorage.removeItem(AUTH_TOKEN_KEY)
   } catch (e) {
-    console.error('Failed to clear credentials:', e)
+    console.error('Failed to clear token:', e)
   }
 }
 
 /**
- * Prompt user for credentials using browser's built-in prompt
- */
-export function promptForCredentials(): AuthCredentials | null {
-  const username = prompt('Please enter your username:')
-  if (!username) return null
-  
-  const password = prompt('Please enter your password:')
-  if (!password) return null
-  
-  return { username, password }
-}
-
-/**
- * Get current authenticated user
- */
-export function getCurrentUser(): string | null {
-  const credentials = getStoredCredentials()
-  return credentials ? credentials.username : null
-}
-
-/**
- * Check if user is authenticated
- */
-export function isAuthenticated(): boolean {
-  return getStoredCredentials() !== null
-}
-
-/**
- * Login - prompt for credentials and store them
- */
-export function login(): boolean {
-  const credentials = promptForCredentials()
-  if (credentials) {
-    storeCredentials(credentials)
-    return true
-  }
-  return false
-}
-
-/**
- * Logout - clear stored credentials
- */
-export function logout(): void {
-  clearCredentials()
-}
-
-/**
- * Get Authorization header value for Basic Auth
+ * Get Authorization header value for Bearer token
  */
 export function getAuthHeader(): string | null {
-  const credentials = getStoredCredentials()
-  if (!credentials) return null
+  const token = getToken()
+  if (!token) return null
   
-  const encoded = btoa(`${credentials.username}:${credentials.password}`)
-  return `Basic ${encoded}`
+  return `Bearer ${token}`
+}
+
+/**
+ * Check if user is authenticated (has a token)
+ */
+export function isAuthenticated(): boolean {
+  return getToken() !== null
+}
+
+/**
+ * Sign in with username and password
+ * @param username - User's username
+ * @param password - User's password
+ * @returns Promise resolving to success boolean
+ */
+export async function signIn(username: string, password: string): Promise<{ success: boolean; error?: string }> {
+  try {
+    const response = await signInApi(username, password)
+    setToken(response.token)
+    return { success: true }
+  } catch (error) {
+    console.error('Sign in failed:', error)
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Sign in failed'
+    }
+  }
+}
+
+/**
+ * Sign out - clear token and reload page
+ */
+export function signOut(): void {
+  clearToken()
+  window.location.href = '/'
 }

@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
-import { useState, useEffect } from 'react'
-import { getCurrentUser, logout } from '../services/authService'
+import { useAuth } from '../hooks/useAuth'
+import { signOut } from '../services/authService'
 import Button from '../components/ui/Button'
 
 // Sample app data - 3x3 grid (9 apps)
@@ -18,26 +18,19 @@ const apps = [
 
 export default function Home() {
   const navigate = useNavigate()
-  const [username, setUsername] = useState<string | null>(null)
-
-  useEffect(() => {
-    setUsername(getCurrentUser())
-  }, [])
+  const { user } = useAuth()
 
   const handleLogout = () => {
-    logout()
-    setUsername(null)
-    // Optionally reload the page to clear any cached data
-    window.location.reload()
+    signOut()
   }
 
   return (
     <div className="tw:min-h-screen tw:bg-gradient-to-b tw:from-gray-900 tw:via-gray-800 tw:to-gray-900 tw:flex tw:flex-col tw:items-center tw:justify-center tw:p-4">
       {/* User info and logout button */}
-      {username && (
+      {user && (
         <div className="tw:absolute tw:top-4 tw:right-4 tw:flex tw:items-center tw:gap-3">
           <span className="tw:text-white tw:text-sm">
-            Logged in as: <span className="tw:font-semibold tw:text-blue-400">{username}</span>
+            Logged in as: <span className="tw:font-semibold tw:text-blue-400">{user.username}</span>
           </span>
           <Button
             onClick={handleLogout}

@@ -2,12 +2,14 @@ import './App.css'
 import { Routes, Route } from 'react-router-dom'
 import Home from './pages/Home'
 import EtymoDictionary from './pages/EtymoDictionary'
+import Login from './pages/Login'
 
 function App() {
   return (
     <div className='tw:h-screen tw:overflow-hidden tw:bg-linear-to-b tw:from-gray-900 tw:via-gray-800 tw:to-gray-900 tw:p-4'>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/etymodictionary" element={<EtymoDictionary />} />
       </Routes>
     </div>

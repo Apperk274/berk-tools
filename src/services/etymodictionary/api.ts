@@ -41,7 +41,10 @@ export async function searchWord(word: string): Promise<WordData> {
     
     if (axios.isAxiosError(error)) {
       if (error.response?.status === 401) {
-        throw new Error('Authentication failed. Please login again.')
+        // Clear token and let the app redirect to login
+        const { clearToken } = await import('../authService')
+        clearToken()
+        throw new Error('Session expired. Please login again.')
       }
       throw new Error(`Failed to search word: ${error.message}`)
     }
@@ -76,7 +79,9 @@ export async function loadSavedWords(): Promise<SavedLemma[]> {
     
     if (axios.isAxiosError(error)) {
       if (error.response?.status === 401) {
-        throw new Error('Authentication failed. Please login again.')
+        const { clearToken } = await import('../authService')
+        clearToken()
+        throw new Error('Session expired. Please login again.')
       }
       throw new Error(`Failed to load saved words: ${error.message}`)
     }
@@ -114,7 +119,9 @@ export async function loadLemmaDetails(lemma: string): Promise<WordData> {
     
     if (axios.isAxiosError(error)) {
       if (error.response?.status === 401) {
-        throw new Error('Authentication failed. Please login again.')
+        const { clearToken } = await import('../authService')
+        clearToken()
+        throw new Error('Session expired. Please login again.')
       }
       throw new Error(`Failed to load lemma details: ${error.message}`)
     }
@@ -151,7 +158,9 @@ export async function saveWord(wordData: WordData): Promise<void> {
     
     if (axios.isAxiosError(error)) {
       if (error.response?.status === 401) {
-        throw new Error('Authentication failed. Please login again.')
+        const { clearToken } = await import('../authService')
+        clearToken()
+        throw new Error('Session expired. Please login again.')
       }
       throw new Error(`Failed to save word: ${error.message}`)
     }
@@ -186,7 +195,9 @@ export async function deleteWord(word: string): Promise<void> {
     
     if (axios.isAxiosError(error)) {
       if (error.response?.status === 401) {
-        throw new Error('Authentication failed. Please login again.')
+        const { clearToken } = await import('../authService')
+        clearToken()
+        throw new Error('Session expired. Please login again.')
       }
       throw new Error(`Failed to delete word: ${error.message}`)
     }

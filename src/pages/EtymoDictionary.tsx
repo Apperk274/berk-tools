@@ -4,10 +4,10 @@ import Button from '../components/ui/Button'
 import Tabs from '../components/ui/Tabs'
 import SearchTab from '../components/etymodictionary/SearchTab'
 import SavedWordsTab from '../components/etymodictionary/SavedWordsTab'
+import AuthGuard from '../components/auth/AuthGuard'
 import type { WordData } from '../types/word'
 import type { SavedLemma } from '../types/api'
 import { loadSavedWords, saveWord, deleteWord } from '../services/etymodictionary'
-import { isAuthenticated, login } from '../services/authService'
 
 function EtymoDictionary() {
   const navigate = useNavigate()
@@ -15,18 +15,6 @@ function EtymoDictionary() {
   const [isSaving, setIsSaving] = useState(false)
   const [isDeleting, setIsDeleting] = useState<string | null>(null)
   const [savedWords, setSavedWords] = useState<SavedLemma[]>([])
-
-  // Check authentication on mount
-  useEffect(() => {
-    if (!isAuthenticated()) {
-      const loggedIn = login()
-      if (!loggedIn) {
-        alert('Authentication is required to access EtymoDictionary')
-        navigate('/')
-        return
-      }
-    }
-  }, [navigate])
 
   // Load saved words from API on mount
   useEffect(() => {
@@ -80,55 +68,57 @@ function EtymoDictionary() {
 
   const tabs = [
     { id: 'search', label: 'Look Up' },
-    { id: 'saved', label: 'Saved', badge: savedWords.length > 0 ? savedWords.length : undefined }
+    { id: 'saved', label: 'Saved', badge: Array.isArray(savedWords) && savedWords.length > 0 ? savedWords.length : undefined }
   ]
 
   return (
-    <div className="tw:h-full tw:flex tw:flex-col tw:overflow-hidden">
-      {/* Header */}
-      <div className="tw:flex tw:justify-between tw:flex-shrink-0 tw:mb-4">
-        <Button
-          onClick={() => navigate('/')}
-          variant="secondary"
-          className="tw:py-3 tw:px-4"
-          icon={<span className="tw:text-xl">←</span>}
-        >
-          Back to Home
-        </Button>
-        <h1 className="tw:text-4xl tw:font-bold tw:text-white">
-          <span className="tw:bg-linear-to-r tw:from-blue-400 tw:via-purple-500 tw:to-pink-500 tw:bg-clip-text tw:text-transparent">
-            EtymoDictionary
-          </span>
-        </h1>
-      </div>
+    <AuthGuard>
+      <div className="tw:h-full tw:flex tw:flex-col tw:overflow-hidden">
+        {/* Header */}
+        <div className="tw:flex tw:justify-between tw:flex-shrink-0 tw:mb-4">
+          <Button
+            onClick={() => navigate('/')}
+            variant="secondary"
+            className="tw:py-3 tw:px-4"
+            icon={<span className="tw:text-xl">←</span>}
+          >
+            Back to Home
+          </Button>
+          <h1 className="tw:text-4xl tw:font-bold tw:text-white">
+            <span className="tw:bg-linear-to-r tw:from-blue-400 tw:via-purple-500 tw:to-pink-500 tw:bg-clip-text tw:text-transparent">
+              EtymoDictionary
+            </span>
+          </h1>
+        </div>
 
-      {/* Tabs and Content */}
-      <div className="tw:max-w-4xl tw:mx-auto tw:w-full tw:flex tw:flex-col tw:flex-1 tw:overflow-hidden">
-        <Tabs
-          tabs={tabs}
-          activeTab={activeTab}
-          onTabChange={(tabId) => setActiveTab(tabId as 'search' | 'saved')}
-          className="tw:my-3 tw:flex-shrink-0"
-        />
+        {/* Tabs and Content */}
+        <div className="tw:max-w-4xl tw:mx-auto tw:w-full tw:flex tw:flex-col tw:flex-1 tw:overflow-hidden">
+          <Tabs
+            tabs={tabs}
+            activeTab={activeTab}
+            onTabChange={(tabId) => setActiveTab(tabId as 'search' | 'saved')}
+            className="tw:my-3 tw:flex-shrink-0"
+          />
 
-        {/* Scrollable Content Area */}
-        <div className="tw:flex-1 tw:overflow-y-auto tw:overflow-x-hidden">
-          {/* Search Tab */}
-          {activeTab === 'search' && (
-            <SearchTab onSave={handleSave} isSaving={isSaving} />
-          )}
+          {/* Scrollable Content Area */}
+          <div className="tw:flex-1 tw:overflow-y-auto tw:overflow-x-hidden">
+            {/* Search Tab */}
+            {activeTab === 'search' && (
+              <SearchTab onSave={handleSave} isSaving={isSaving} />
+            )}
 
-          {/* Saved Words Tab */}
-          {activeTab === 'saved' && (
-            <SavedWordsTab
-              savedWords={savedWords}
-              onDelete={handleDelete}
-              isDeleting={isDeleting}
-            />
-          )}
+            {/* Saved Words Tab */}
+            {activeTab === 'saved' && (
+              <SavedWordsTab
+                savedWords={savedWords}
+                onDelete={handleDelete}
+                isDeleting={isDeleting}
+              />
+            )}
+          </div>
         </div>
       </div>
-    </div>
+    </AuthGuard>
   )
 }
 
