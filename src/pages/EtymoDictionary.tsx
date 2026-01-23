@@ -104,7 +104,11 @@ function EtymoDictionary() {
           <div className="tw:flex-1 tw:overflow-y-auto tw:overflow-x-hidden">
             {/* Search Tab */}
             {activeTab === 'search' && (
-              <SearchTab onSave={handleSave} isSaving={isSaving} />
+              <SearchTab 
+                onSave={handleSave} 
+                isSaving={isSaving}
+                savedWords={savedWords}
+              />
             )}
 
             {/* Saved Words Tab */}

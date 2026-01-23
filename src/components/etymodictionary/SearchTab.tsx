@@ -1,20 +1,29 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import Input from '../ui/Input'
 import Button from '../ui/Button'
 import WordDetails from './WordDetails'
 import type { WordData } from '../../types/word'
+import type { SavedLemma } from '../../types/api'
 import { searchWord as searchWordApi } from '../../services/etymodictionary'
 
 interface SearchTabProps {
   onSave: (wordData: WordData) => Promise<void>
   isSaving: boolean
+  savedWords: SavedLemma[]
 }
 
-export default function SearchTab({ onSave, isSaving }: SearchTabProps) {
+export default function SearchTab({ onSave, isSaving, savedWords }: SearchTabProps) {
   const [searchInput, setSearchInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [currentResult, setCurrentResult] = useState<WordData | null>(null)
   const [error, setError] = useState<string | null>(null)
+
+  // Check if current result is already saved
+  const isAlreadySaved = useMemo(() => {
+    if (!currentResult) return false
+    if (!Array.isArray(savedWords)) return false
+    return savedWords.some(saved => saved.lemma.toLowerCase() === currentResult.word.toLowerCase())
+  }, [currentResult, savedWords])
 
   const handleSearchWord = async (word: string) => {
     setIsLoading(true)
@@ -53,7 +62,7 @@ export default function SearchTab({ onSave, isSaving }: SearchTabProps) {
   return (
     <div className="tw:flex tw:flex-col tw:h-full tw:overflow-hidden">
       {/* Search Input - Fixed */}
-      <div className="tw:flex-shrink-0 tw:mb-4">
+      <div className="tw:shrink-0 tw:mb-4">
         <div className="tw:flex tw:gap-0 tw:border tw:border-gray-700/50 tw:rounded-lg tw:overflow-hidden">
           <Input
             value={searchInput}
@@ -99,14 +108,25 @@ export default function SearchTab({ onSave, isSaving }: SearchTabProps) {
               <h2 className="tw:text-2xl tw:font-bold tw:text-white tw:capitalize">
                 {currentResult.word}
               </h2>
-              <Button
-                onClick={handleSave}
-                disabled={isSaving}
-                isLoading={isSaving}
-                variant="success"
-                className="tw:py-3 tw:px-5"
-                icon={<span className="tw:text-xl">💾</span>}
-              />
+              {isAlreadySaved ? (
+                <Button
+                  disabled={true}
+                  variant="secondary"
+                  className="tw:py-3 tw:px-5 tw:cursor-not-allowed"
+                  icon={<span className="tw:text-xl">✓</span>}
+                >
+                  Saved
+                </Button>
+              ) : (
+                <Button
+                  onClick={handleSave}
+                  disabled={isSaving}
+                  isLoading={isSaving}
+                  variant="success"
+                  className="tw:py-3 tw:px-5"
+                  icon={<span className="tw:text-xl">💾</span>}
+                />
+              )}
             </div>
 
             <WordDetails wordData={currentResult} />
