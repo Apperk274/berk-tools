@@ -12,8 +12,10 @@ interface SavedWordsTabProps {
 export default function SavedWordsTab({ savedWords, onDelete, isDeleting }: SavedWordsTabProps) {
   const [searchInput, setSearchInput] = useState('')
 
-  // Ensure savedWords is always an array
-  const wordsArray = Array.isArray(savedWords) ? savedWords : []
+  // Ensure savedWords is always an array and filter out invalid entries
+  const wordsArray = Array.isArray(savedWords) 
+    ? savedWords.filter(item => item && typeof item.lemma === 'string')
+    : []
   
   const filteredWords = wordsArray.filter((savedLemma) => 
     savedLemma.lemma.toLowerCase().includes(searchInput.toLowerCase())
