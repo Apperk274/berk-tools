@@ -75,16 +75,14 @@ function EtymoDictionary() {
     <AuthGuard>
       <div className="tw:h-full tw:flex tw:flex-col tw:overflow-hidden">
         {/* Header */}
-        <div className="tw:flex tw:justify-between tw:flex-shrink-0 tw:mb-4">
+        <div className="tw:flex tw:items-center tw:justify-center tw:shrink-0 tw:mb-4 tw:relative">
           <Button
             onClick={() => navigate('/')}
             variant="secondary"
-            className="tw:py-3 tw:px-4"
-            icon={<span className="tw:text-xl">←</span>}
-          >
-            Back to Home
-          </Button>
-          <h1 className="tw:text-4xl tw:font-bold tw:text-white">
+            className="tw:py-3 tw:absolute tw:left-0"
+            icon={<span className="tw:text-4xl">←</span>}
+          />
+          <h1 className="tw:text-2xl tw:font-bold tw:text-white">
             <span className="tw:bg-linear-to-r tw:from-blue-400 tw:via-purple-500 tw:to-pink-500 tw:bg-clip-text tw:text-transparent">
               EtymoDictionary
             </span>
@@ -97,7 +95,7 @@ function EtymoDictionary() {
             tabs={tabs}
             activeTab={activeTab}
             onTabChange={(tabId) => setActiveTab(tabId as 'search' | 'saved')}
-            className="tw:my-3 tw:flex-shrink-0"
+            className="tw:my-2 tw:shrink-0"
           />
 
           {/* Scrollable Content Area */}
