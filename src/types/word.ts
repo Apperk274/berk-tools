@@ -10,4 +10,10 @@ export interface WordData {
   etymology: string
   etymologyLink?: string
   howToRemember: string
+  pronunciation?: {
+    ipa_uk?: string
+    ipa_us?: string
+    easy_uk?: string
+    easy_us?: string
+  }
 }

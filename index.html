@@ -5,6 +5,14 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>berk-tools</title>
+    <script type="text/javascript" src="/mespeak/mespeak.js"></script>
+    <script type="text/javascript">
+      // Initialize meSpeak immediately after loading
+      if (window.meSpeak) {
+        meSpeak.loadConfig("/mespeak/mespeak_config.json");
+        meSpeak.loadVoice("/mespeak/en.json");
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

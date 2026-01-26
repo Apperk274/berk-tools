@@ -19,8 +19,8 @@ export function transformApiResponseToWordData(data: ApiWordResponse, fallbackWo
   const etymologyText = data.etymology?.text || ''
   const etymologyLink = data.etymology?.link || undefined
 
-  // Format pronunciation
-  const pronunciation = data.pronunciation ? 
+  // Format pronunciation for display
+  const pronunciationDisplay = data.pronunciation ? 
     `UK: ${data.pronunciation.easy_uk || data.pronunciation.ipa_uk || ''} | US: ${data.pronunciation.easy_us || data.pronunciation.ipa_us || ''}` : ''
 
   return {
@@ -28,8 +28,9 @@ export function transformApiResponseToWordData(data: ApiWordResponse, fallbackWo
     definition: data.meaning_en || '',
     exampleSentences: data.examples || [],
     turkishEquivalent: turkishMeanings,
-    etymology: etymologyText + (pronunciation ? `\n\nPronunciation: ${pronunciation}` : ''),
+    etymology: etymologyText + (pronunciationDisplay ? `\n\nPronunciation: ${pronunciationDisplay}` : ''),
     etymologyLink: etymologyLink,
-    howToRemember: data.remember_insight || ''
+    howToRemember: data.remember_insight || '',
+    pronunciation: data.pronunciation
   }
 }
