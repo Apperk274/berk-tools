@@ -30,6 +30,10 @@ export default defineConfig({
             type: 'image/png'
           }
         ]
+      },
+      workbox: {
+        // Increase the file size limit to accommodate mespeak.js (2.47 MB)
+        maximumFileSizeToCacheInBytes: 3 * 1024 * 1024 // 3 MB
       }
     })
   ],
